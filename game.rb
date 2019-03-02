@@ -30,13 +30,7 @@ class GameWindow < Gosu::Window
     @state.scroll_clouds += 1.0
     @state.scroll_x += 1.5
 
-    if @state.scroll_clouds > @images[:foreground1].width
-      @state.scroll_clouds = 0
-    end
-
-    if @state.scroll_x > @images[:foreground1].width
-      @state.scroll_x = 0
-    end
+    [:scroll_x, :scroll_clouds].each {|key| reset_to_zero(key) }
   end
 
   def draw
@@ -46,6 +40,10 @@ class GameWindow < Gosu::Window
 
     @images[:foreground2].draw(-@state.scroll_x, 0, 0)
     @images[:foreground2].draw(-@state.scroll_x + @images[:foreground2].width, 0, 0)
+  end
+
+  def reset_to_zero(key)
+    @state[key] = 0 if @state[key] > 500 # foreground image width
   end
 end
 
