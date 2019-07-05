@@ -2,11 +2,12 @@ require "gosu"
 require "ostruct"
 
 class GameWindow < Gosu::Window
-  JUMP_VELOCITY = -300
+  JUMP_VELOCITY = -450
   STATE = {
     scroll_clouds: 0,
     scroll_x: 0,
     player: nil,
+    player_jumping: false,
     player_velocity: 0,
     counter: 0
   }
@@ -29,7 +30,7 @@ class GameWindow < Gosu::Window
   def button_down(button)
     case button
     when Gosu::KbEscape then close
-    when Gosu::KbSpace then @state.player_velocity = JUMP_VELOCITY
+    when Gosu::KbSpace then @state.player_jumping = true
     end
   end
 
@@ -41,8 +42,8 @@ class GameWindow < Gosu::Window
     @state.scroll_x += delta_time * 150
     @state.player = next_player(@state.counter)
 
-    # @state.player_velocity +=
-    puts @state.counter
+    update_jumping
+    # puts @state.counter
 
     [:scroll_x, :scroll_clouds].each {|key| reset_to_zero(key) }
   end
@@ -56,6 +57,21 @@ class GameWindow < Gosu::Window
     @images[:foreground2].draw(-@state.scroll_x + @images[:foreground2].width, 0, 0)
 
     @state.player.draw(30, @state.player_velocity + 340, 0)
+  end
+
+  def update_jumping
+    if @state.player_jumping
+      if @state.player_velocity > JUMP_VELOCITY
+        @state.player_velocity -= 20
+      else
+        @state.player_jumping = false
+        @state.player_velocity = JUMP_VELOCITY
+      end
+    else
+      if @state.player_velocity <= 0
+        @state.player_velocity += 10
+      end
+    end
   end
 
   def reset_to_zero(key)
